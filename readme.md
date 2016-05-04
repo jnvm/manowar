@@ -3,7 +3,7 @@ _(experimental!)_
 
 Have difficulty matching concurrent request events?
 
-![logging example](/portugese-manowar.png?raw=true)
+![logging example](https://raw.githubusercontent.com/jnvm/manowar/master/portugese-manowar.png)
 
 This module provides a live logger that indents each request's logs a uniform amount, connecting them all along a line. (or tendril!)
 
@@ -55,4 +55,4 @@ app .use(require('express-domain-middleware'))//be sure this is added!
 ## Logging defaults
 `cc('text')` logging works, but extra colors & icons are available at `cc.*` (if you leave icons on):
 
-![logging defaults](icons.png?raw=true)
+![logging defaults](https://raw.githubusercontent.com/jnvm/manowar/master/icons.png)
