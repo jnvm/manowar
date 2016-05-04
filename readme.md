@@ -8,6 +8,7 @@ Have difficulty matching concurrent request events?
 This module provides a live logger that indents each request's logs a uniform amount, connecting them all along a line. (or tendril!)
 
 This helps visualize a few things:
+
 1. in what order async events occur ...in sync (so this isn't applicable to true parallelism in, say, web workers)
 2. which requests generated which logs in high-traffic scenarios
 3. how long requests take
@@ -52,6 +53,6 @@ app .use(require('express-domain-middleware'))//be sure this is added!
 
 ```
 ## Logging defaults
-`cc('text')` logging works, but extra colors & icons are available at `cc.*`:
+`cc('text')` logging works, but extra colors & icons are available at `cc.*` (if you leave icons on):
 
 ![logging defaults](icons.png?raw=true)
