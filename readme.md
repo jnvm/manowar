@@ -13,7 +13,9 @@ This helps visualize a few things:
 2. which requests generated which logs in high-traffic scenarios
 3. how long requests take
 
+
 This requires a few things to work:
+
 * that you use the provided `cc()` logger, which is a terse, icon-able, crayon-colorable, extendable way to log things
     * (this also provides `cc.sql`, a log format ideal to plug into [dbq](https://github.com/jnvm/dbq), should you use that)
 * that you already use [express-domain-middleware](https://www.npmjs.com/package/express-domain-middleware), since domains remain the most reliable way to preserve an indentation context over [cls](https://www.npmjs.com/package/continuation-local-storage) and [async wrappers](https://github.com/nodejs/tracing-wg/tree/master/docs/AsyncWrap).
