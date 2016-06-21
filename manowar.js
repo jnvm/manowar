@@ -104,7 +104,7 @@ module.exports=function(opts={}){
 		var t1=new Date()
 			,id=req.id||process.domain.id
 
-			,forceKillAfter=opts.forceRequestKillAfter||10*1000
+			,forceKillAfter=opts.forceRequestKillAfter===undefined? 10*1000 : opts.forceRequestKillAfter
 			,indent=(()=>{
 				var i=0
 					,lvl=_.keyBy(activeRequests,'domain.indent')
@@ -115,7 +115,7 @@ module.exports=function(opts={}){
 		req.indent=indent
 		activeRequests[id]=req
 		process.domain.req=req
-		var abandonTimer=setTimeout(()=>{
+		var abandonTimer=!forceKillAfter ? -1 : setTimeout(()=>{
 				cc.bad("killing req!",id)
 				if(!res.headersSent)
 					res.status(408).send("Request Timeout")
@@ -124,7 +124,7 @@ module.exports=function(opts={}){
 			,logEndReq=_.once(()=>{
 				var t=((Date.now()-t1)/1000).toFixed(3)
 				cc.end(res.statusCode+" in "+crayon.bold[t<1?"green":t<3?"yellow":"red"](t+"s"))
-				clearTimeout(abandonTimer)
+				forceKillAfter && clearTimeout(abandonTimer)
 				delete activeRequests[id]
 			})
 

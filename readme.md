@@ -31,7 +31,7 @@ This requires a few things to work:
 var {cc,requestLogger}=require("manowar")({
         //option:default
         ellipsize:true //cut off log lines once they exceed window width
-        ,forceRequestKillAfter:10000//kill requests that take longer than this many millisecond
+        ,forceRequestKillAfter:10000//kill requests that take longer than this many milliseconds. Falsy = never.
         ,logEachReq:(req,res)=>false //a fxn for you to customize the incoming request log. Return false to defer to plugin default
         ,overrideIconsWith:"" //some displays don't correctly space icons & break the line display. Override them here
         ,cc:{//any custom logging shortcuts you'd like.
