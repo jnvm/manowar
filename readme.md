@@ -18,8 +18,6 @@ This requires a few things to work:
 
 * that you use the provided `cc()` logger, which is a terse, icon-able, crayon-colorable, extendable way to log things
     * (this also provides `cc.sql`, a log format ideal to plug into [dbq](https://github.com/jnvm/dbq), should you use that)
-* that you already use [express-domain-middleware](https://www.npmjs.com/package/express-domain-middleware), since domains remain the most reliable way to preserve an indentation context over [cls](https://www.npmjs.com/package/continuation-local-storage) and [async wrappers](https://github.com/nodejs/tracing-wg/tree/master/docs/AsyncWrap).
-    * (beware certain promise implementations do not preserve domain context)
 * that you include the `requestLogger` express middleware atop your router, which itself does a few things:
     * initiate the request's indentation, which is maintained until it replies or dies
     * log out some req info, which is customizable
@@ -49,8 +47,7 @@ router.use(requestLogger)
     })
 
 
-app .use(require('express-domain-middleware'))//be sure this is added!
-    .use(router)
+app.use(router)
 
 
 ```

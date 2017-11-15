@@ -1,6 +1,6 @@
 {
   "name": "manowar",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "logger that indents by active request count to help see how async requests are handled, often resembling jellyfish tendrils",
   "main": "manowar.js",
   "scripts": {
@@ -20,7 +20,10 @@
   "author": "Joη <j@nvm.io> (http://nvm.io)",
   "license": "MIT",
   "dependencies": {
-    "crayon-terminal": "^3.0.1",
-    "lodash": "^4.11.1"
+    "chalk": "^2.3.0",
+    "cls-hooked": "^4.2.2",
+    "lodash": "^4.11.1",
+    "shortid": "^2.2.8",
+    "strip-ansi": "^4.0.0"
   }
 }
