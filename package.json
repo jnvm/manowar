@@ -1,6 +1,6 @@
 {
   "name": "manowar",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "logger that indents by active request count to help see how async requests are handled, often resembling jellyfish tendrils",
   "main": "manowar.js",
   "scripts": {

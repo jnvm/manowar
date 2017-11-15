@@ -69,13 +69,18 @@ module.exports=function(opts={}){
 
 					var  maxW=process.stdout.columns
 						,stack=Error("line count retrieval").stack
+						,filenameSize=15
 						,line=_.padStart(
-							opt.line
-							|| (stack.split("\n")[3].match(/([^\/]+\.js[:\d]+)/)
-									||
-									['','']
-								)[1].split(":").slice(0,2).join(":")
-						,15).slice(0,15)
+								(opt.line
+								||
+								_.find(stack.split("\n").slice(1),x=>!x.match(/node_modules/))
+								)
+								.match(/(\S+\.js\S+)/)[1]
+								.replace(/[()]/g,'')
+								.split(":").slice(0,2).join(":")
+								.split('/').pop()
+							,filenameSize)
+							.slice(0,filenameSize)
 						,color=getColor()
 						,indent=_.defaultTo(namespace.get('indent'),0)
 						,maxIndent=Math.max(..._.keys(activeRequests))+1
@@ -134,7 +139,6 @@ module.exports=function(opts={}){
 					return i
 				})()
 			req.indent=indent
-			req.manowarColor=indent
 			activeRequests[indent]={req,color}
 			namespace.set('req',req)
 			namespace.set('indent',indent)
