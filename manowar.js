@@ -68,13 +68,21 @@ module.exports=function(opts={}){
 				,log=(icon,lineStyling,msgs,opt={}) => {
 
 					var  maxW=process.stdout.columns
-						,stack=Error("line count retrieval").stack
+						,stack=Error("line count retrieval").stack.split("\n")
 						,filenameSize=15
-						,line=_.padStart(
-								(opt.line
-								||
-								_.find(stack.split("\n").slice(1),x=>!x.match(/node_modules/))
-								)
+						,lastLine=''
+						,targetLine=(opt.line
+							|| _.find(stack.slice(1),x=>!x.match(/node_modules/))
+							|| _.reduce(stack.slice(1),(found,line)=>{
+								if(found) return found
+								if(!line.match(/manowar/) && lastLine.match(/manowar/)){
+									found=lastLine
+								}
+								lastLine=line
+								return found
+							},false)
+						)
+						,line=_.padStart(targetLine
 								.match(/(\S+\.js\S+)/)[1]
 								.replace(/[()]/g,'')
 								.split(":").slice(0,2).join(":")
