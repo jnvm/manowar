@@ -30,7 +30,7 @@ module.exports=function(opts={}){
 					,no   :(...a)      =>log( opts.overrideIconsWith || String.fromCharCode(9940) ,chalk.bgWhite.red,a)
 					,hey  :(...a)      =>log( opts.overrideIconsWith || String.fromCharCode(9755) ,chalk.bold.bgHex("00f").hex("f0f"),a)
 					,aro  :(...a)      =>log( opts.overrideIconsWith || String.fromCharCode(8680) ,chalk.bold.bgHex("f0f").hex("0f0"),a)
-					,good :(...a)      =>log( opts.overrideIconsWith || String.fromCharCode(9989) ,chalk.bold.color("#0f0"),a)
+					,good :(...a)      =>log( opts.overrideIconsWith || String.fromCharCode(9989) ,chalk.bold.hex("#0f0"),a)
 					,great:(...a)      =>log( opts.overrideIconsWith || String.fromCharCode(10004),chalk.bgHex("0f0").black,a)
 					,email:(...a)      =>log( opts.overrideIconsWith || String.fromCharCode(9993) ,chalk.gold,a)
 					,free :(...a)      =>log( opts.overrideIconsWith || String.fromCharCode(9995) ,chalk.white,a)
@@ -53,7 +53,7 @@ module.exports=function(opts={}){
 							,tooks=" in "+took+"s"
 							,say=query.sql.replace(/[\t\s\v]/g,' ').replace(/\s{2,}/g,' ').trim()
 
-						cc.custom({icon:chalk.bgHex('111').gray(String.fromCharCode(9658)),line:queryLine}//"🔎"
+						cc.custom({icon:String.fromCharCode(9658),line:queryLine}//"🔎"
 							,chalk.bgHex('111').hex('eee')(_.padStart(meta,15).replace(/!:([^0]\d*)/,x=>chalk.yellow(x)))
 							+chalk.bgHex('111')[ took<1?'blue'
 									:took<5?'yellow'
@@ -104,7 +104,7 @@ module.exports=function(opts={}){
 						,given=_.castArray(msgs).map(x=>util.format(x))
 						,msg=indentChars
 							+color(sep)
-							+(lineStyling ? lineStyling(icon,...given) : icon + given)
+							+(lineStyling ? lineStyling(icon,...given) : color(icon) + given)
 						,plainLength=stripAnsi(msg).length
 						,remainder=Math.max(0,maxIndent-plainLength)
 						
@@ -129,7 +129,8 @@ module.exports=function(opts={}){
 
 					)
 				}
-			return _.extend(o.info,o,{namespace,chalk})
+			
+			return _.extend(o.info,o,{chalk,namespace})
 		})()
 
 	var requestLogger=function(req,res,next){
@@ -161,8 +162,16 @@ module.exports=function(opts={}){
 				},forceKillAfter)
 				,logEndReq=_.once(()=>{
 					var t=((Date.now()-t1)/1000).toFixed(3)
-					cc.end(res.statusCode+" in "+chalk.bold[t<1?"green":t<3?"yellow":"red"](t+"s"))
-					forceKillAfter && clearTimeout(abandonTimer)
+						,hex='040'
+					switch(res.statusCode.toString()[0]*1){
+						case 1:hex='004';break
+						case 2:hex='040';break
+						case 3:hex='044';break
+						case 4:hex='404';break
+						case 5:hex='400';break
+					}
+					cc.end(chalk.bgHex(hex).hex('fff')(` ${res.statusCode} `)+" in "+chalk.bold[t<1?"green":t<3?"yellow":"red"](t+"s"))
+					if(forceKillAfter) clearTimeout(abandonTimer)
 					delete activeRequests[indent]
 				})
 	
@@ -171,9 +180,9 @@ module.exports=function(opts={}){
 				||
 				(
 					//chalk.gray(t1.toJSON().replace(/\D/g,''))//time?
-					chalk[req.method=='GET' ? 'bgGreen' : 'bgYellow'].hex('000')(req.method)
+					chalk.bgHex([req.method=='GET' ? '0f0' : 'ff0']).hex('000').bold(` ${req.method} `)
 					+" "
-					+chalk.hex('7f0')(req.headers.host)
+					+chalk.hex('7f0')('127.0.0.1')//req.headers.host)
 					+chalk.magenta.bold(req.path)
 					+chalk.hex('0ff')(req._parsedUrl.search||'')
 				)

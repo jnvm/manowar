@@ -1,26 +1,27 @@
 # Man O' War Logger
-_(experimental!)_
 
-Have difficulty matching concurrent request events?
+Have difficulty matching concurrent request event logs?
 
-![logging example](https://cldup.com/LiFEgyAIDR.png)
+![logging example](https://cldup.com/D_miZ5S9lE.PNG)
 
-This module provides a live logger that indents each request's logs a uniform amount, connecting them all along a line. (or tendril!)
+This module provides a live logger that indents each request's logs a uniform amount, connecting them all along a line. (or [tendril on a Portugese Man O' War](https://en.wikipedia.org/wiki/Portuguese_man_o%27_war)!)
 
 This helps visualize a few things:
 
 1. in what order async events occur ...in sync (so this isn't applicable to true parallelism in, say, web workers)
-2. which requests generated which logs in high-traffic scenarios
+2. which requests generated which logs in concurrent-traffic scenarios, supplemented by a correlation_id for records
 3. how long requests take
+4. file line references generating logs
+5. also it is colorful
 
 
 This requires a few things to work:
 
-* that you use the provided `cc()` logger, which is a terse, icon-able, crayon-colorable, extendable way to log things
+* that you use the provided `cc()` logger, which is a terse, icon-able, chalk-colorable, extendable way to log things
     * (this also provides `cc.sql`, a log format ideal to plug into [dbq](https://github.com/jnvm/dbq), should you use that)
-* that you include the `requestLogger` express middleware atop your router, which itself does a few things:
+* that you include the `requestLogger` express middleware atop your router (or above all the routes you want logs for), which itself does a few things:
     * initiate the request's indentation, which is maintained until it replies or dies
-    * log out some req info, which is customizable
+    * log out some req info
     * kill requests that take longer than `forceRequestKillAfter` milliseconds (defaults to 10 seconds)
     * times requests for reference
 
@@ -55,3 +56,7 @@ app.use(router)
 `cc('text')` logging works, but extra colors & icons are available at `cc.*` (if you leave icons on):
 
 ![logging defaults](https://cldup.com/kWMQYbmg9K.png)
+
+Additionally:
+* `cc.chalk` exists for you to stylize additional logs locally with [`chalk`](https://www.npmjs.com/chalk)
+* `cc.namespace` will give you access to the current [`cls-hooked`](https://www.npmjs.com/cls-hooked) namespace `manowar` set up to manage indentation, should you like to use it or attach more info in a local scope.
