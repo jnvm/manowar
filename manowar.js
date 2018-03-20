@@ -130,7 +130,7 @@ module.exports=function(opts={}){
 					)
 				}
 			
-			return _.extend(o.info,o,{chalk,namespace})
+			return _.extend(o.info,o,{chalk,namespace,lastHue,activeRequests})
 		})()
 
 	var requestLogger=function(req,res,next){
