@@ -1,6 +1,6 @@
 {
   "name": "manowar",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "logger that indents by active request count to help see how async requests are handled, often resembling jellyfish tendrils",
   "main": "manowar.js",
   "scripts": {
@@ -24,6 +24,6 @@
     "cls-hooked": "^4.2.2",
     "lodash": "^4.11.1",
     "shortid": "^2.2.8",
-    "strip-ansi": "^4.0.0"
+    "strip-ansi": "^5.0.0"
   }
 }

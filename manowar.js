@@ -1,22 +1,33 @@
 module.exports=function(opts={}){
 	var _=require("lodash")
 		,chalk=require("chalk")
-		,activeRequests={}
 		,cls=require('cls-hooked')
-		,namespace=cls.createNamespace('manowar')
-		,shortid = require('shortid').generate
 		,stripAnsi=require('strip-ansi')
+		,fs=require('fs')
 		,util=require('util')
-		,lastHue=~~(Math.random()*360)
-		,maxIdLength=11
-		,getColor=()=>_.get(activeRequests[namespace.get('indent')],'color',chalk.reset.gray)
-		,cc
 	chalk.level=2
 	_.defaults(opts,{
 		ellipsize:true//cut off logs that exceed terminal width instead of wrapping
 		,logEachReq:(req,res)=>false// take what data you want from the req & display as you'd like. Or let the default display.
 		,overrideIconsWith:undefined// until it can be determined how to deal with icons...breaking things lining up...
+		,logBody:true
+		,fileNameSize:20
+		,fileLineFilter:false
+		,maxIdLength:11
+		,idMaker:require('shortid').generate
+		,widthFudgeFactor:15//sometimes process.stdout.columns lies?
+		,logSync:false//fs.writeSync vs console.log
 	})
+
+	var activeRequests={}
+		,namespace=cls.createNamespace('manowar')
+		,shortid=opts.idMaker
+		,fileLineFilter=opts.fileLineFilter
+		,fileNameSize=opts.fileNameSize
+		,maxIdLength=opts.maxIdLength
+		,lastHue=~~(Math.random()*360)
+		,getColor=()=>_.get(activeRequests[namespace.get('indent')],'color',chalk.reset.gray)
+		,cc
 
 	cc=(function indentAwareConsoleLogger(){
 			var o=_.extend({
@@ -67,11 +78,11 @@ module.exports=function(opts={}){
 				,unmarkedSeparator=String.fromCharCode(9474)
 				,log=(icon,lineStyling,msgs,opt={}) => {
 
-					var  maxW=process.stdout.columns
+					var  maxW=process.stdout.columns-opts.widthFudgeFactor
 						,stack=Error("line count retrieval").stack.split("\n")
-						,filenameSize=15
 						,lastLine=''
 						,targetLine=(opt.line
+							|| fileLineFilter && fileLineFilter(stack)
 							|| _.find(stack.slice(1),x=>!x.match(/node_modules/))
 							|| _.reduce(stack.slice(1),(found,line)=>{
 								if(found) return found
@@ -87,11 +98,10 @@ module.exports=function(opts={}){
 								.replace(/[()]/g,'')
 								.split(":").slice(0,2).join(":")
 								.split('/').pop()
-							,filenameSize)
-							.slice(0,filenameSize)
+							,fileNameSize)
+							.slice(0,fileNameSize)
 						,color=getColor()
 						,indent=_.defaultTo(namespace.get('indent'),0)
-						,maxIndent=Math.max(..._.keys(activeRequests))+1
 						,indentChars=" ".repeat(indent)
 							.split("")
 							.map((emptySpace,i)=>{
@@ -105,29 +115,26 @@ module.exports=function(opts={}){
 						,msg=indentChars
 							+color(sep)
 							+(lineStyling ? lineStyling(icon,...given) : color(icon) + given)
-						,plainLength=stripAnsi(msg).length
-						,remainder=Math.max(0,maxIndent-plainLength)
-						
+						,id=namespace.get('cid')||" ".repeat(maxIdLength)
+						,plainLength=stripAnsi([line,id,msg].join(" ")).length
+
 					//console.log(Error("line count retrieval").stack)
 					//console.log({stack})
 
-					console.log(
+					var fullMsg=[
 						 chalk.reset()
 						,chalk.gray(line)
-						,color(namespace.get('cid')||" ".repeat(maxIdLength))
+						,color(id)
 						,chalk.reset()
-						,(opts.ellipsize && plainLength>maxW
-							? msg.substr(0,maxW-5)+String.fromCharCode(8230)
+						,(opts.ellipsize && plainLength>(maxW)
+							? msg.substr(0,maxW)+String.fromCharCode(8230)
 							: msg
 						)
 						,chalk.reset()
-						//am I short enough to merit later line continuations?
-						," ".repeat(remainder).split("").map((emptySpace,i)=>{
-							i+=plainLength+2//?
-							return activeRequests[i] ? activeRequests[i].color(unmarkedSeparator) : emptySpace
-						}).join("")
-
-					)
+						,'\n'
+					]
+					if(opts.logSync) fs.writeSync(process.stdout.fd||1,fullMsg.join(' '))
+					else console.log(...fullMsg)
 				}
 			
 			return _.extend(o.info,o,{chalk,namespace,lastHue,activeRequests})
@@ -136,7 +143,7 @@ module.exports=function(opts={}){
 	var requestLogger=function(req,res,next){
 		namespace.run(()=>{
 			var t1=new Date()
-				,id=shortid().padEnd(maxIdLength,"0")
+				,id=shortid(req).padEnd(maxIdLength,"0")
 				,color=(()=>{
 					lastHue=(lastHue+157)%360
 					return chalk.reset.hsl(lastHue,50,50)
@@ -195,7 +202,7 @@ module.exports=function(opts={}){
 			global.lastReq=req
 			global.lastRes=res
 			
-			if(!_.isEmpty(req.body)) cc.info({body:req.body})
+			if(opts.logBody && !_.isEmpty(req.body)) cc.info({body:req.body})
 			
 			next()
 		})

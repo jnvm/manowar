@@ -33,6 +33,13 @@ var {cc,requestLogger}=require("manowar")({
         ,forceRequestKillAfter:10000//kill requests that take longer than this many milliseconds. Falsy = never.
         ,logEachReq:(req,res)=>false //a fxn for you to customize the incoming request log. Return false to defer to plugin default
         ,overrideIconsWith:"" //some displays don't correctly space icons & break the line display. Override them here
+		,logBody:true //whether to log request bodies
+		,fileNameSize:20 //max width to allow for file names on the left
+		,fileLineFilter:false //if you need a custom stacktrace filter to get the file name
+		,maxIdLength:11 //length of id col
+		,idMaker:require('shortid').generate //if you want to supply IDs your own way
+		,widthFudgeFactor:15//sometimes process.stdout.columns lies?
+		,logSync:false//fs.writeSync vs console.log
         ,cc:{//any custom logging shortcuts you'd like.
             //coming soon
         }
