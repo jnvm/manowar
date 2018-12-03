@@ -1,7 +1,7 @@
 {
   "name": "manowar",
-  "version": "1.0.0",
-  "description": "logger that indents by active request count to help see how async requests are handled, often resembling jellyfish tendrils",
+  "version": "1.0.1",
+  "description": "visually differentiate request logs via indentation, coloring, and namespacing via cls-hooked",
   "main": "manowar.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,6 +11,14 @@
     "async",
     "logging",
     "console",
+    "cls",
+    "continuation local storage",
+    "namespace",
+    "chalk",
+    "colorful",
+    "correlation",
+    "trace",
+    "wire",
     "log"
   ],
   "repository": {
@@ -24,6 +32,7 @@
     "cls-hooked": "^4.2.2",
     "lodash": "^4.11.1",
     "shortid": "^2.2.8",
+    "slice-ansi": "^2.0.0",
     "strip-ansi": "^5.0.0"
   }
 }

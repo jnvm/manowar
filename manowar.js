@@ -2,6 +2,7 @@ module.exports=function(opts={}){
 	var _=require("lodash")
 		,chalk=require("chalk")
 		,cls=require('cls-hooked')
+		,sliceAnsi=require('slice-ansi')
 		,stripAnsi=require('strip-ansi')
 		,fs=require('fs')
 		,util=require('util')
@@ -14,8 +15,8 @@ module.exports=function(opts={}){
 		,fileNameSize:20
 		,fileLineFilter:false
 		,maxIdLength:11
+		,widthFudgeFactor:0
 		,idMaker:require('shortid').generate
-		,widthFudgeFactor:15//sometimes process.stdout.columns lies?
 		,logSync:false//fs.writeSync vs console.log
 	})
 
@@ -94,7 +95,7 @@ module.exports=function(opts={}){
 							},false)
 						)
 						,line=_.padStart(targetLine
-								.match(/(\S+\.js\S+)/)[1]
+								.match(/(\S+\.js\S*)/)[1]
 								.replace(/[()]/g,'')
 								.split(":").slice(0,2).join(":")
 								.split('/').pop()
@@ -116,25 +117,25 @@ module.exports=function(opts={}){
 							+color(sep)
 							+(lineStyling ? lineStyling(icon,...given) : color(icon) + given)
 						,id=namespace.get('cid')||" ".repeat(maxIdLength)
-						,plainLength=stripAnsi([line,id,msg].join(" ")).length
 
 					//console.log(Error("line count retrieval").stack)
 					//console.log({stack})
 
 					var fullMsg=[
-						 chalk.reset()
-						,chalk.gray(line)
-						,color(id)
+						 chalk.reset.gray(line)
 						,chalk.reset()
-						,(opts.ellipsize && plainLength>(maxW)
-							? msg.substr(0,maxW)+String.fromCharCode(8230)
-							: msg
-						)
+							+color(id)
 						,chalk.reset()
-						,'\n'
-					]
-					if(opts.logSync) fs.writeSync(process.stdout.fd||1,fullMsg.join(' '))
-					else console.log(...fullMsg)
+							+msg
+							+chalk.reset()
+					].join(" ")
+					
+					var plainLength=stripAnsi(fullMsg).length
+					if(opts.ellipsize && plainLength>(maxW-1)){
+						fullMsg=sliceAnsi(fullMsg,0,maxW-1)+String.fromCharCode(8230)
+					}
+					if(opts.logSync) fs.writeSync(process.stdout.fd||1,fullMsg+'\n')
+					else console.log(fullMsg)
 				}
 			
 			return _.extend(o.info,o,{chalk,namespace,lastHue,activeRequests})

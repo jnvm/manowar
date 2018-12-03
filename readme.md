@@ -38,7 +38,7 @@ var {cc,requestLogger}=require("manowar")({
 		,fileLineFilter:false //if you need a custom stacktrace filter to get the file name
 		,maxIdLength:11 //length of id col
 		,idMaker:require('shortid').generate //if you want to supply IDs your own way
-		,widthFudgeFactor:15//sometimes process.stdout.columns lies?
+		,widthFudgeFactor:0//maybe process.stdout.columns lies on your box
 		,logSync:false//fs.writeSync vs console.log
         ,cc:{//any custom logging shortcuts you'd like.
             //coming soon
